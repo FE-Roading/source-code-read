@@ -11,10 +11,13 @@
  *
  * Date: 2021-03-02T17:08Z
  */
+// global 为全局对象，在浏览器或者webview环境下，指向window；Node环境指向global
+// factory 为jQuery核心工厂函数：noGlobal表明是否向window中注入$、jQuery对象
 ( function( global, factory ) {
 
 	"use strict";
 
+	// 支持CommonJS模块的导入导出规范「NODE OR WEBPACK」
 	if ( typeof module === "object" && typeof module.exports === "object" ) {
 
 		// For CommonJS and CommonJS-like environments where a proper `window`
@@ -24,8 +27,10 @@
 		// This accentuates the need for the creation of a real `window`.
 		// e.g. var jQuery = require("jquery")(window);
 		// See ticket #14549 for more info.
+		 // global.document 存在说明是WEBPACK环境「global->window」
 		module.exports = global.document ?
 			factory( global, true ) :
+			// 在其余的没有window的环境下，导出一个函数，后期执行函数，如果可以传递一个window进来，也能正常使用，否则报错。
 			function( w ) {
 				if ( !w.document ) {
 					throw new Error( "jQuery requires a window with a document" );
@@ -33,10 +38,12 @@
 				return factory( w );
 			};
 	} else {
+		//浏览器或者webview中基于<script>直接导入的
 		factory( global );
 	}
 
 // Pass this if window is not defined yet
+// 如果是在浏览器或者webview环境下运行JS，则传入window对象；如果是在Node环境下执行，则传入global或者当前模块。
 } )( typeof window !== "undefined" ? window : this, function( window, noGlobal ) {
 
 // Edge <= 12 - 13+, Firefox <=18 - 45+, IE 10 - 11, Safari 5.1 - 9+, iOS 6 - 9.1
