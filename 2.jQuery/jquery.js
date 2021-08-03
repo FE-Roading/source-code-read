@@ -12,7 +12,7 @@
  * Date: 2021-03-02T17:08Z
  */
 // global 为全局对象，在浏览器或者webview环境下，指向window；Node环境指向global
-// factory 为jQuery核心工厂函数：noGlobal表明是否向window中注入$、jQuery对象
+// factory 为jQuery核心工厂函数：noGlobal表明是否向window中注入$、jQuery对象。 通过script导入时，会默认挂载
 ( function( global, factory ) {
 
 	"use strict";
@@ -10844,13 +10844,12 @@ jQuery.trim = function( text ) {
 // declare themselves as anonymous modules, and avoid setting a global if an
 // AMD loader is present. jQuery is a special case. For more information, see
 // https://github.com/jrburke/requirejs/wiki/Updating-existing-libraries#wiki-anon
-
+// 支持AMD模块化思想,不常用
 if ( typeof define === "function" && define.amd ) {
 	define( "jquery", [], function() {
 		return jQuery;
 	} );
 }
-
 
 
 
@@ -10861,7 +10860,7 @@ var
 
 	// Map over the $ in case of overwrite
 	_$ = window.$;
-
+//多库共存解决权限冲突,导入jQuery（代码执行前）解决权限冲突
 jQuery.noConflict = function( deep ) {
 	if ( window.$ === jQuery ) {
 		window.$ = _$;
@@ -10877,12 +10876,12 @@ jQuery.noConflict = function( deep ) {
 // Expose jQuery and $ identifiers, even in AMD
 // (#7102#comment:10, https://github.com/jquery/jquery/pull/557)
 // and CommonJS for browser emulators (#13566)
+//浏览器直接导入处理 => $() / jQuery() 都是把内部的jQuery方法执行
 if ( typeof noGlobal === "undefined" ) {
 	window.jQuery = window.$ = jQuery;
 }
 
 
-
-
+// 基于WEBPACK处理 module.export = jQuery; 导入方式：import jQuery from 'jQuery';
 return jQuery;
 } );
